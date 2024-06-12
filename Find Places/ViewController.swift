@@ -10,25 +10,37 @@ import MapKit
 class ViewController: UIViewController {
     lazy var mapView:MKMapView={
        let map=MKMapView()
-//        map.showsUserLocation=true
+        map.showsUserLocation=true
         map.translatesAutoresizingMaskIntoConstraints=false
         return map
     }()
-    
+    //41, 20, 15
     lazy var textField:UITextField={
        let searchField=UITextField()
         searchField.placeholder="Search"
-        searchField.layer.cornerRadius=6
-        searchField.clipsToBounds=true
         searchField.backgroundColor = .white
+        searchField.layer.cornerRadius=6
+        searchField.delegate=self
+        searchField.layer.borderColor = UIColor.black.cgColor
+        searchField.layer.masksToBounds = false
+        searchField.layer.shadowOffset = CGSize(width: 0, height: 0)
+        searchField.layer.shadowOpacity = 0.7
+        searchField.clipsToBounds=false
+        searchField.layer.shadowRadius = 8
         searchField.leftView=UIView(frame: CGRect(x: 0, y: 0, width: 10, height: 0))
         searchField.leftViewMode = .always
         searchField.translatesAutoresizingMaskIntoConstraints=false
         return searchField
     }()
+    
+    var locationManager:CLLocationManager?
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemBlue
+        
+        locationManager=CLLocationManager()
+        locationManager?.delegate=self //  it delgetae it function to self meaning to ViewController itself
+        locationManager?.requestWhenInUseAuthorization()
+        locationManager?.requestLocation()
         setupUI()
     }
 
@@ -52,6 +64,78 @@ class ViewController: UIViewController {
         textField.topAnchor.constraint(equalTo: view.topAnchor, constant: 60).isActive=true
         textField.returnKeyType = .go
     }
+    
+    private func checkAuthorization(){
+        guard let locationManager=locationManager, let location=locationManager.location else {return}
+        switch locationManager.authorizationStatus{
+        case .authorizedWhenInUse, .authorizedAlways:
+            focusLocation(location: location)
+        case .restricted, .notDetermined:
+            print("restricted")
+        case .denied:
+            print("denied")
+        @unknown default:
+            print("default")
+        }
+    }
+    
+    private func focusLocation(location:CLLocation){
+        let region=MKCoordinateRegion(center: location.coordinate, latitudinalMeters: 600, longitudinalMeters: 600)
+        mapView.setRegion(region, animated: true)
+    }
+    
+    private func presentSheet(places:[PlaceAnnotation]){
+        guard let locationManager=locationManager, let location=locationManager.location else {return}
+        let pageVC=PageSheetViewController(userLocation: location, places: places)
+        pageVC.modalPresentationStyle = .pageSheet
+        if let sheet=pageVC.sheetPresentationController{
+            sheet.prefersGrabberVisible=true
+            sheet.detents=[.medium(),.large()]
+            present(pageVC, animated: true)
+        }
+    }
+    
+    private func findPlaces(by text:String){
+        mapView.removeAnnotations(mapView.annotations)
+        let request=MKLocalSearch.Request()
+        request.naturalLanguageQuery=text
+        request.region=mapView.region
+        let search=MKLocalSearch(request: request)
+        search.start {[weak self] response, error in
+            guard let response=response, error==nil, let self=self else {return}
+            let places=response.mapItems.map(PlaceAnnotation.init)
+            places.forEach { place in
+                self.mapView.addAnnotation(place)
+            }
+            self.presentSheet(places:places)
+        }
+        
+    }
 
 }
 
+
+extension ViewController:CLLocationManagerDelegate{
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        
+    }
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: any Error) {
+        print(error)
+    }
+    
+    func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+        checkAuthorization()
+    }
+    
+}
+
+extension ViewController:UITextFieldDelegate{
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        let text=textField.text ?? ""
+        if !text.isEmpty{
+            textField.resignFirstResponder()
+            findPlaces(by: text)
+        }
+        return true
+    }
+}
