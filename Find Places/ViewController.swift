@@ -11,6 +11,7 @@ class ViewController: UIViewController {
     lazy var mapView:MKMapView={
        let map=MKMapView()
         map.showsUserLocation=true
+        map.delegate=self
         map.translatesAutoresizingMaskIntoConstraints=false
         return map
     }()
@@ -34,6 +35,7 @@ class ViewController: UIViewController {
     }()
     
     var locationManager:CLLocationManager?
+    var places:[PlaceAnnotation]=[]
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -103,7 +105,7 @@ class ViewController: UIViewController {
         let search=MKLocalSearch(request: request)
         search.start {[weak self] response, error in
             guard let response=response, error==nil, let self=self else {return}
-            let places=response.mapItems.map(PlaceAnnotation.init)
+            places=response.mapItems.map(PlaceAnnotation.init)
             places.forEach { place in
                 self.mapView.addAnnotation(place)
             }
@@ -137,5 +139,22 @@ extension ViewController:UITextFieldDelegate{
             findPlaces(by: text)
         }
         return true
+    }
+}
+
+
+extension ViewController:MKMapViewDelegate{
+    private func clearAllSelection(){
+        self.places=self.places.map({ item in
+            item.isSelected=false
+            return item
+        })
+    }
+    func mapView(_ mapView: MKMapView, didSelect annotation: any MKAnnotation) {
+        clearAllSelection()
+        guard let selectAnnotation=annotation as? PlaceAnnotation else {return}
+        let placeAnnoataion=self.places.first(where: {$0.id==selectAnnotation.id})
+        placeAnnoataion?.isSelected=true
+        self.presentSheet(places: self.places)
     }
 }

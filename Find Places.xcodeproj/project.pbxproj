@@ -14,6 +14,7 @@
 		4B7CA43B2C19A0B700D01E93 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 4B7CA43A2C19A0B700D01E93 /* Base */; };
 		4B7CA4442C19C03A00D01E93 /* PageSheetViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B7CA4432C19C03A00D01E93 /* PageSheetViewController.swift */; };
 		4B7CA4462C19C2FB00D01E93 /* AnnotationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B7CA4452C19C2FB00D01E93 /* AnnotationModel.swift */; };
+		4B7CA4482C19D94300D01E93 /* DetailPageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B7CA4472C19D94300D01E93 /* DetailPageViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +27,7 @@
 		4B7CA43C2C19A0B700D01E93 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4B7CA4432C19C03A00D01E93 /* PageSheetViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageSheetViewController.swift; sourceTree = "<group>"; };
 		4B7CA4452C19C2FB00D01E93 /* AnnotationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnotationModel.swift; sourceTree = "<group>"; };
+		4B7CA4472C19D94300D01E93 /* DetailPageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailPageViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -74,6 +76,7 @@
 			isa = PBXGroup;
 			children = (
 				4B7CA4432C19C03A00D01E93 /* PageSheetViewController.swift */,
+				4B7CA4472C19D94300D01E93 /* DetailPageViewController.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -148,6 +151,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4B7CA4482C19D94300D01E93 /* DetailPageViewController.swift in Sources */,
 				4B7CA4332C19A0B500D01E93 /* ViewController.swift in Sources */,
 				4B7CA4442C19C03A00D01E93 /* PageSheetViewController.swift in Sources */,
 				4B7CA42F2C19A0B500D01E93 /* AppDelegate.swift in Sources */,

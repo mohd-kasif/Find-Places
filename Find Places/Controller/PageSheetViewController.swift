@@ -12,7 +12,7 @@ import SwiftUI
 class PageSheetViewController:UITableViewController{
     
     var userLocation: CLLocation
-    let places: [PlaceAnnotation]
+    var places: [PlaceAnnotation]
     
     init(userLocation: CLLocation, places: [PlaceAnnotation]) {
         self.userLocation = userLocation
@@ -21,10 +21,31 @@ class PageSheetViewController:UITableViewController{
         
         // register cell
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "PlaceCell")
+        self.places.swapAt(indexOfSelected ?? 0, 0)
+    }
+    var indexOfSelected:Int?{
+        self.places.firstIndex(where: {$0.isSelected==true})
+    }
+    
+    func calculateDistance(from:CLLocation, to:CLLocation)->String{
+        let distance=from.distance(from: to)
+        return formatDistance(distance: distance)
+        
+        
+    }
+    func formatDistance(distance:CLLocationDistance)->String{
+        let meters=Measurement(value: distance, unit: UnitLength.meters)
+        return meters.converted(to: .kilometers).formatted()
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         places.count
+    }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let place=places[indexPath.row]
+        let vc=DetailPageViewController(place: place)
+        present(vc, animated: true)
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -35,9 +56,10 @@ class PageSheetViewController:UITableViewController{
         // cell configuration
         var content = cell.defaultContentConfiguration()
         content.text = place.name
-        content.secondaryText = "Secondary Text"
+        content.secondaryText = calculateDistance(from: userLocation, to: place.location)
         
         cell.contentConfiguration = content
+        cell.backgroundColor=place.isSelected ? .gray : .clear
         return cell
     }
     

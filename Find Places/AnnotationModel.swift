@@ -7,7 +7,6 @@
 
 import Foundation
 import MapKit
-
 class PlaceAnnotation:MKPointAnnotation{
     let mapItem:MKMapItem
     let id=UUID()
@@ -26,5 +25,9 @@ class PlaceAnnotation:MKPointAnnotation{
     }
     var address:String{
         "\(mapItem.placemark.subThoroughfare ?? "") \(mapItem.placemark.thoroughfare ?? "") \(mapItem.placemark.locality ?? "") \(mapItem.placemark.countryCode ?? "")"
+    }
+    
+    var location: CLLocation {
+        mapItem.placemark.location ?? CLLocation(latitude: 24, longitude: 74)
     }
 }
